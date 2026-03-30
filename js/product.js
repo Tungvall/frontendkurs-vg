@@ -1,12 +1,10 @@
-import { addToCart } from "./cart.js";
-import { initCartUi } from "./cart-ui.js";
+
 import {
   formatPrice,
   getRecentlyViewed,
   getStoredProducts,
   saveRecentlyViewed,
 } from "./shared.js";
-import { renderCart } from "./render.js";
 
 const productDetail = document.getElementById("product-detail");
 const recentProducts = document.getElementById("recent-products");
@@ -14,26 +12,6 @@ const recentProducts = document.getElementById("recent-products");
 const getProductIdFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
   return Number(params.get("id"));
-};
-
-const createAddToCartButton = (product) => {
-  const button = document.createElement("button");
-
-  button.type = "button";
-  button.dataset.add = product.id;
-  button.className =
-    "inline-flex items-center rounded-2xl border-4 border-black bg-blue-500 px-4 py-2 text-sm font-black text-white shadow-[4px_4px_0_0_#000] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none";
-  button.textContent = "Lägg i kundvagn";
-
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const updatedCart = addToCart(product);
-    renderCart(updatedCart);
-  });
-
-  return button;
 };
 
 const createRecentProductCard = (product) => {
@@ -141,8 +119,6 @@ const renderProductDetail = (product) => {
   const actionRow = document.createElement("div");
   actionRow.className = "mt-6";
 
-  actionRow.appendChild(createAddToCartButton(product));
-
   content.appendChild(category);
   content.appendChild(title);
   content.appendChild(description);
@@ -204,6 +180,4 @@ const init = () => {
   renderProductDetail(product);
   renderRecentProducts(product.id);
 };
-
-initCartUi();
 init();

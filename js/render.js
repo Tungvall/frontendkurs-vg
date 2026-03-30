@@ -1,9 +1,6 @@
 import {
   $,
   formatPrice,
-  getCart,
-  getCartCount,
-  getCartTotal,
   getCategories,
   getFilteredProducts,
 } from "./shared.js";
@@ -11,12 +8,6 @@ import {
 export const ui = {
   categoryList: $("category-list"),
   productList: $("product-list"),
-  cartToggle: $("cart-toggle"),
-  cartDropdown: $("cart-dropdown"),
-  cartItems: $("cart-items"),
-  cartTotal: $("cart-total"),
-  cartCount: $("cart-count"),
-  clearCartBtn: $("clear-cart-btn"),
   checkoutLink: $("checkout-link"),
 };
 
@@ -135,7 +126,7 @@ const createProductCard = (product, categories) => {
   button.dataset.add = product.id;
   button.className =
     "inline-flex items-center rounded-2xl border-4 border-black bg-blue-500 px-4 py-2 text-sm font-black text-white shadow-[4px_4px_0_0_#000] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none";
-  button.textContent = "Lägg i kundvagn";
+  button.textContent = "Köp";
 
   footer.appendChild(price);
   footer.appendChild(button);
@@ -146,76 +137,6 @@ const createProductCard = (product, categories) => {
   return article;
 };
 
-const createCartItem = (item) => {
-  const row = document.createElement("div");
-  row.className =
-    "rounded-2xl border-4 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]";
-
-  const top = document.createElement("div");
-  top.className = "flex items-start justify-between gap-3";
-
-  const info = document.createElement("div");
-  info.className = "min-w-0";
-
-  const title = document.createElement("h3");
-  title.className = "truncate text-sm font-black text-black";
-  title.textContent = item.title;
-
-  const price = document.createElement("p");
-  price.className = "mt-1 text-sm font-bold text-blue-700";
-  price.textContent = formatPrice(item.price);
-
-  info.appendChild(title);
-  info.appendChild(price);
-
-  const lineTotal = document.createElement("strong");
-  lineTotal.className = "text-sm font-black text-black";
-  lineTotal.textContent = formatPrice(item.price * item.quantity);
-
-  top.appendChild(info);
-  top.appendChild(lineTotal);
-
-  const controls = document.createElement("div");
-  controls.className = "mt-3 flex items-center gap-2";
-
-  const decrease = document.createElement("button");
-  decrease.type = "button";
-  decrease.dataset.id = item.id;
-  decrease.dataset.change = "-1";
-  decrease.className =
-    "inline-flex h-8 w-8 items-center justify-center rounded-xl border-2 border-black bg-white font-black text-black";
-  decrease.textContent = "−";
-
-  const quantity = document.createElement("span");
-  quantity.className = "min-w-8 text-center text-sm font-black text-black";
-  quantity.textContent = String(item.quantity);
-
-  const increase = document.createElement("button");
-  increase.type = "button";
-  increase.dataset.id = item.id;
-  increase.dataset.change = "1";
-  increase.className =
-    "inline-flex h-8 w-8 items-center justify-center rounded-xl border-2 border-black bg-white font-black text-black";
-  increase.textContent = "+";
-
-  const remove = document.createElement("button");
-  remove.type = "button";
-  remove.dataset.id = item.id;
-  remove.dataset.change = String(-item.quantity);
-  remove.className =
-    "ml-auto inline-flex items-center rounded-xl border-2 border-black bg-red-500 px-3 py-1 text-xs font-black text-white";
-  remove.textContent = "Ta bort";
-
-  controls.appendChild(decrease);
-  controls.appendChild(quantity);
-  controls.appendChild(increase);
-  controls.appendChild(remove);
-
-  row.appendChild(top);
-  row.appendChild(controls);
-
-  return row;
-};
 
 export const renderCategories = (state) => {
   if (!ui.categoryList) {
@@ -264,43 +185,8 @@ export const renderProducts = (state) => {
   });
 };
 
-export const renderCart = (cart) => {
-  if (!ui.cartItems || !ui.cartTotal || !ui.cartCount) {
-    return;
-  }
-
-  const count = getCartCount(cart);
-
-  ui.cartCount.textContent = String(count);
-  ui.cartCount.classList.toggle("hidden", count === 0);
-
-  ui.cartItems.replaceChildren();
-
-  if (!cart.length) {
-    const empty = document.createElement("p");
-    empty.className = "text-sm font-bold text-gray-700";
-    empty.textContent = "Kundvagnen är tom.";
-    ui.cartItems.appendChild(empty);
-  } else {
-    cart.forEach((item) => {
-      ui.cartItems.appendChild(createCartItem(item));
-    });
-  }
-
-  ui.cartTotal.textContent = formatPrice(getCartTotal(cart));
-};
-
-export const setCartOpen = (open) => {
-  if (!ui.cartToggle || !ui.cartDropdown) {
-    return;
-  }
-
-  ui.cartDropdown.classList.toggle("hidden", !open);
-  ui.cartToggle.setAttribute("aria-expanded", String(open));
-};
 
 export const render = (state) => {
   renderCategories(state);
   renderProducts(state);
-  renderCart(getCart());
 };

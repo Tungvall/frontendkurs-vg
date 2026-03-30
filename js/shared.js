@@ -13,15 +13,7 @@ const writeJson = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
-export const getCart = () => readJson("cart", []);
 
-export const saveCart = (cart) => {
-  writeJson("cart", cart);
-};
-
-export const clearCartStorage = () => {
-  localStorage.removeItem("cart");
-};
 
 export const getStoredProducts = () => readJson("products", []);
 
@@ -48,12 +40,6 @@ export const formatPrice = (price) => {
     maximumFractionDigits: 2,
   })} kr`;
 };
-
-export const getCartTotal = (cart) =>
-  cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-export const getCartCount = (cart) =>
-  cart.reduce((sum, item) => sum + item.quantity, 0);
 
 export const getCategories = (products) => [
   "allt",
