@@ -3,6 +3,7 @@ import {
   formatPrice,
   getCategories,
   getFilteredProducts,
+  getProductImage,
 } from "./shared.js";
 
 export const ui = {
@@ -50,6 +51,16 @@ const FALLBACK_THEME = {
   card: "bg-gray-100",
 };
 
+const truncateText = (text, maxLength = 110) => {
+  if (!text) {
+    return "";
+  }
+
+  return text.length > maxLength
+    ? `${text.slice(0, maxLength).trim()}...`
+    : text;
+};
+
 const getCategoryTheme = (category, categories) => {
   const index = categories.indexOf(category);
 
@@ -80,36 +91,41 @@ const createCategoryButton = (category, isActive, categories) => {
 
 const createProductCard = (product, categories) => {
   const article = document.createElement("article");
-  const theme = getCategoryTheme(product.category, categories);
+  const categoryName = product.category ?? "okänd";
+  const theme = getCategoryTheme(categoryName, categories);
 
   article.className = [
-    "flex flex-col rounded-3xl border-4 border-black p-5",
+    "flex h-full flex-col rounded-3xl border-4 border-black p-5",
     theme.card,
     "shadow-[6px_6px_0_0_#000]",
   ].join(" ");
 
   const link = document.createElement("a");
   link.href = `./product.html?id=${product.id}`;
-  link.className = "block";
+  link.className = "block flex-1";
 
-  const img = document.createElement("img");
-  img.src = product.image;
-  img.alt = product.title;
-  img.className = "mb-4 h-48 w-full object-contain";
+  const imageUrl = getProductImage(product);
+
+  if (imageUrl) {
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = product.title ?? "Produktbild";
+    img.className = "mb-4 h-48 w-full object-contain";
+    link.appendChild(img);
+  }
 
   const category = document.createElement("p");
   category.className = "text-xs font-black uppercase text-red-600";
-  category.textContent = product.category;
+  category.textContent = categoryName;
 
   const title = document.createElement("h3");
   title.className = "mt-2 text-lg font-black";
-  title.textContent = product.title;
+  title.textContent = product.title ?? "Okänd produkt";
 
   const description = document.createElement("p");
-  description.className = "mt-2 text-sm text-gray-700";
-  description.textContent = product.description;
+  description.className = "mt-2 text-sm leading-5 text-gray-700";
+  description.textContent = truncateText(product.description, 110);
 
-  link.appendChild(img);
   link.appendChild(category);
   link.appendChild(title);
   link.appendChild(description);
@@ -136,7 +152,6 @@ const createProductCard = (product, categories) => {
 
   return article;
 };
-
 
 export const renderCategories = (state) => {
   if (!ui.categoryList) {
@@ -184,7 +199,6 @@ export const renderProducts = (state) => {
     ui.productList.appendChild(createProductCard(product, categories));
   });
 };
-
 
 export const render = (state) => {
   renderCategories(state);

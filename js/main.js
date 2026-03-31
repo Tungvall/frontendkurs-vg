@@ -1,27 +1,33 @@
-import { normalizeProduct, saveStoredProducts } from "./shared.js";
-import {
-  render,
-  renderCategories,
-  renderProducts,
-  ui,
-} from "./render.js";
+import { saveStoredProducts } from "./shared.js";
+import { render, ui } from "./render.js";
 
 const state = {
   products: [],
   selectedCategory: "allt",
 };
 
+const PRODUCTS_API = "https://fakestoreapi.samuelsson.sh/products";
+
 async function loadItems() {
+  if (ui.productList) {
+    ui.productList.innerHTML =
+      '<p class="rounded-2xl border-4 border-black bg-white p-4 font-bold shadow-[4px_4px_0_0_#000]">Laddar produkter...</p>';
+  }
+
   try {
-    const response = await fetch("https://fakestoreapi.com/products");
+    const response = await fetch(PRODUCTS_API);
 
     if (!response.ok) {
-      throw new Error("Could not load products from Fake Store API");
+      throw new Error("Could not load products");
     }
 
-    const products = await response.json();
+    const result = await response.json();
 
-    state.products = products.map(normalizeProduct);
+    state.products = Array.isArray(result)
+      ? result
+      : Array.isArray(result.data)
+        ? result.data
+        : [];
 
     saveStoredProducts(state.products);
     render(state);
@@ -36,36 +42,33 @@ async function loadItems() {
 }
 
 function setupPageEvents() {
-  if (ui.categoryList) {
-    ui.categoryList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-category]");
+  ui.categoryList?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-category]");
 
-      if (!button) {
-        return;
-      }
+    if (!button) {
+      return;
+    }
 
-      state.selectedCategory = button.dataset.category;
-      renderCategories(state);
-      renderProducts(state);
-    });
-  }
+    state.selectedCategory = button.dataset.category;
+    render(state);
+  });
 
-  if (ui.productList) {
-    ui.productList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-add]");
+  ui.productList?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-add]");
 
-      if (!button) {
-        return;
-      }
+    if (!button) {
+      return;
+    }
 
-      const productId = Number(button.dataset.add);
-      const product = state.products.find((item) => item.id === productId);
+    const productId = Number(button.dataset.add);
+    const product = state.products.find((item) => item.id === productId);
 
-      if (!product) {
-        return;
-      }
-    });
-  }
+    if (!product) {
+      return;
+    }
+
+    console.log("Added product:", product);
+  });
 }
 
 setupPageEvents();
