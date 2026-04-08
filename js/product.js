@@ -74,7 +74,7 @@ const renderRecentProducts = (currentProductId) => {
   });
 };
 
-const renderSpecs = (specs) => {
+/* const renderSpecs = (specs) => {
   const list = document.createElement("ul");
   list.className = "mt-4 space-y-2 text-sm font-medium text-gray-700";
 
@@ -85,7 +85,7 @@ const renderSpecs = (specs) => {
   });
 
   return list;
-};
+}; */
 
 const renderProductDetail = (product) => {
   if (!productDetail) {
@@ -157,7 +157,7 @@ const renderProductDetail = (product) => {
   //content.appendChild(rating);
   content.appendChild(price);
   //content.appendChild(specsTitle);
-  content.appendChild(renderSpecs(product.specs));
+  //content.appendChild(renderSpecs(product.specs));
   content.appendChild(button);
 
   wrapper.appendChild(imageBox);
