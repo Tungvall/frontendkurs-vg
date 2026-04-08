@@ -74,19 +74,6 @@ const renderRecentProducts = (currentProductId) => {
   });
 };
 
-/* const renderSpecs = (specs) => {
-  const list = document.createElement("ul");
-  list.className = "mt-4 space-y-2 text-sm font-medium text-gray-700";
-
-  Object.entries(specs ?? {}).forEach(([key, value]) => {
-    const item = document.createElement("li");
-    item.textContent = `${key}: ${value}`;
-    list.appendChild(item);
-  });
-
-  return list;
-}; */
-
 const renderProductDetail = (product) => {
   if (!productDetail) {
     return;
@@ -130,16 +117,6 @@ const renderProductDetail = (product) => {
   stock.className = "mt-2 text-sm font-bold text-gray-700";
   stock.textContent = `Lager: ${product.stock ?? 0}`;
 
-  /* const rating = document.createElement("p");
-  rating.className = "mt-2 text-sm font-bold text-gray-700";
-  rating.textContent = `Betyg: ${product.rating?.rate ?? 0} (${
-    product.rating?.count ?? 0
-  } recensioner)`; */
-
-  /* const specsTitle = document.createElement("h2");
-  specsTitle.className = "mt-6 text-xl font-black text-blue-600";
-  specsTitle.textContent = "Specifikationer"; */
-
   const price = document.createElement("p");
   price.className = "mt-6 text-3xl font-black text-blue-700";
   price.textContent = product.price;
@@ -154,10 +131,7 @@ const renderProductDetail = (product) => {
   content.appendChild(title);
   content.appendChild(description);
   content.appendChild(stock);
-  //content.appendChild(rating);
   content.appendChild(price);
-  //content.appendChild(specsTitle);
-  //content.appendChild(renderSpecs(product.specs));
   content.appendChild(button);
 
   wrapper.appendChild(imageBox);

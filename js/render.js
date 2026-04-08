@@ -1,6 +1,5 @@
 import {
   $,
-  formatPrice,
   getCategories,
   getFilteredProducts,
   getProductImage,

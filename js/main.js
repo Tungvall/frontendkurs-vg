@@ -57,23 +57,6 @@ function setupPageEvents() {
     state.selectedCategory = button.dataset.category;
     render(state);
   });
-
-  ui.productList?.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-add]");
-
-    if (!button) {
-      return;
-    }
-
-    const productId = Number(button.dataset.add);
-    const product = state.products.find((item) => item.id === productId);
-
-    if (!product) {
-      return;
-    }
-
-    console.log("Added product:", product);
-  });
 }
 
 setupPageEvents();
