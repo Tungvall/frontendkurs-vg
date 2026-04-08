@@ -130,15 +130,15 @@ const renderProductDetail = (product) => {
   stock.className = "mt-2 text-sm font-bold text-gray-700";
   stock.textContent = `Lager: ${product.stock ?? 0}`;
 
-  const rating = document.createElement("p");
+  /* const rating = document.createElement("p");
   rating.className = "mt-2 text-sm font-bold text-gray-700";
   rating.textContent = `Betyg: ${product.rating?.rate ?? 0} (${
     product.rating?.count ?? 0
-  } recensioner)`;
+  } recensioner)`; */
 
-  const specsTitle = document.createElement("h2");
+  /* const specsTitle = document.createElement("h2");
   specsTitle.className = "mt-6 text-xl font-black text-blue-600";
-  specsTitle.textContent = "Specifikationer";
+  specsTitle.textContent = "Specifikationer"; */
 
   const price = document.createElement("p");
   price.className = "mt-6 text-3xl font-black text-blue-700";
@@ -148,9 +148,9 @@ const renderProductDetail = (product) => {
   content.appendChild(title);
   content.appendChild(description);
   content.appendChild(stock);
-  content.appendChild(rating);
+  //content.appendChild(rating);
   content.appendChild(price);
-  content.appendChild(specsTitle);
+  //content.appendChild(specsTitle);
   content.appendChild(renderSpecs(product.specs));
 
   wrapper.appendChild(imageBox);
