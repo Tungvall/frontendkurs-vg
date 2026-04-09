@@ -1,6 +1,6 @@
 export const $ = (id) => document.getElementById(id);
 
-const readJson = (key, fallback) => {
+export const getStorage = (key, fallback) => {
   try {
     const value = localStorage.getItem(key);
     return value ? JSON.parse(value) : fallback;
@@ -9,23 +9,23 @@ const readJson = (key, fallback) => {
   }
 };
 
-const writeJson = (key, value) => {
+export const setStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
-export const getStoredProducts = () => readJson("products", []);
+export const getStoredProducts = () => getStorage("products", []);
 
 export const saveStoredProducts = (products) => {
-  writeJson("products", products);
+  setStorage("products", products);
 };
 
-export const getRecentlyViewed = () => readJson("recentlyViewed", []);
+export const getRecentlyViewed = () => getStorage("recentlyViewed", []);
 
 export const saveRecentlyViewed = (product) => {
   const updated = getRecentlyViewed().filter((item) => item.id !== product.id);
 
   updated.unshift(product);
-  writeJson("recentlyViewed", updated.slice(0, 6));
+  setStorage("recentlyViewed", updated.slice(0, 6));
 };
 
 const usdToSek = 9.38;

@@ -1,6 +1,7 @@
 import { getProductImage, getStoredProducts } from "../shared.js";
 import { pattern } from "./patterns.js";
 import { renderReceipt } from "./receiptView.js";
+import { state } from "../main.js";
 
 const checkoutProduct = document.getElementById("checkout-product");
 const checkoutForm = document.getElementById("checkout-form");
@@ -8,7 +9,7 @@ const submitCartButton = document.getElementById("submitCart");
 const formMessage = document.getElementById("form-message");
 const userInformation = document.getElementById("user-information");
 
-const state = {
+const formState = {
   name: false,
   email: false,
   phone: false,
@@ -16,7 +17,7 @@ const state = {
   postal: false,
   city: false,
 };
-const stateMessage = {
+const messageState = {
   name: "Fel namn",
   email: "Fel epost",
   phone: "Fel nummer",
@@ -26,11 +27,6 @@ const stateMessage = {
 };
 
 let selectedProduct = null;
-
-const getProductIdFromUrl = () => {
-  const params = new URLSearchParams(window.location.search);
-  return Number(params.get("id"));
-};
 
 const renderProductMessage = (message) => {
   if (!checkoutProduct) {
@@ -94,62 +90,44 @@ const renderProduct = (product) => {
   const price = document.createElement("p");
   price.className = "mt-4 text-lg font-black text-blue-700";
   price.textContent = product.price;
+  const quantity = document.createElement("p");
+  quantity.className = "mt-4 text-lg font-black text-blue-700";
+  quantity.textContent = product.quantity;
 
   article.appendChild(category);
   article.appendChild(title);
   article.appendChild(description);
-  article.appendChild(price);
+  checkoutProduct.appendChild(price);
+  checkoutProduct.appendChild(quantity);
 
   checkoutProduct.appendChild(article);
 };
 
 const init = () => {
-  const productId = getProductIdFromUrl();
-
-  if (!productId) {
+  document.title = `Checkout - Grupp 10`;
+  if (!state.cart.length) {
     document.title = "Ingen produkt vald - Grupp 10";
-    renderProductMessage("Ingen produkt vald.");
+    renderProductMessage("Inga produkter i din varukorg");
     return;
   }
-
-  const products = getStoredProducts();
-
-  if (!products.length) {
-    document.title = "Produkter saknas - Grupp 10";
-    renderProductMessage(
-      "Kunde inte hitta produkter i localStorage. Gå tillbaka till startsidan först.",
-    );
-    return;
+  console.table(state.cart);
+  if (state.cart.length === 1) {
+    renderProduct(state.cart[0]);
+  } else if (state.cart.length > 1) {
+    renderCart(customer);
   }
-
-  const product = products.find((item) => item.id === productId);
-
-  if (!product) {
-    document.title = "Produkt saknas - Grupp 10";
-    renderProductMessage("Produkten kunde inte hittas.");
-    return;
-  }
-
-  selectedProduct = product;
-  document.title = `Checkout - ${product.title} - Grupp 10`;
-  renderProduct(product);
 };
 
 if (checkoutForm) {
   checkoutForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    if (!selectedProduct) {
-      renderFormMessage("Ingen produkt är laddad.");
-      return;
-    }
-
     const customer = getCustomerData(checkoutForm);
 
-    Object.keys(state).forEach((key) => {
-      state[key] = false;
+    Object.keys(formState).forEach((key) => {
+      formState[key] = false;
 
-      userInformation.innerHTML = renderReceipt(customer, selectedProduct);
+      userInformation.innerHTML = renderReceipt(customer);
       submitCartButton.disabled = true;
       // checkoutForm.reset();
     });
@@ -168,10 +146,10 @@ function validate(input) {
 
   const inputField = input.dataset.validate;
   const isValid = pattern[inputField].test(input.value);
-  state[inputField] = isValid;
+  formState[inputField] = isValid;
 
   if (!isValid) {
-    renderFormMessage(stateMessage[inputField]);
+    renderFormMessage(messageState[inputField]);
   } else {
     renderFormMessage("Fyll i dina uppgifter för att slutföra köpet.");
   }
@@ -183,7 +161,7 @@ function validate(input) {
 }
 
 function updateButton() {
-  if (Object.values(state).every(Boolean)) {
+  if (Object.values(formState).every(Boolean)) {
     submitCartButton.disabled = false;
   } else {
     submitCartButton.disabled = true;

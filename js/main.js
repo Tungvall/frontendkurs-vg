@@ -1,11 +1,14 @@
-import { saveStoredProducts, formatPrice } from "./shared.js";
+import { saveStoredProducts, formatPrice, getStorage } from "./shared.js";
 import { render, ui } from "./render.js";
 import { actions } from "./actions.js";
 
-const state = {
+export const state = {
   products: [],
+  cart: [],
   selectedCategory: "allt",
 };
+
+state.cart = getStorage("cart") || [];
 
 const PRODUCTS_API = "https://fakestoreapi.samuelsson.sh/products";
 
@@ -32,6 +35,7 @@ async function loadItems() {
 
     state.products = products.map((product) => ({
       ...product,
+      id: Number(product.id),
       price: formatPrice(product.price),
     }));
 
