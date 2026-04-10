@@ -3,6 +3,7 @@ import {
   getCategories,
   getFilteredProducts,
   getProductImage,
+  formatPrice,
 } from "./shared.js";
 
 export const ui = {
@@ -134,7 +135,7 @@ const createProductCard = (product, categories) => {
 
   const price = document.createElement("strong");
   price.className = "text-lg font-black text-blue-700";
-  price.textContent = product.price;
+  price.textContent = formatPrice(product.price);
 
   const button = document.createElement("div");
   button.dataset.action = "addToCart";
