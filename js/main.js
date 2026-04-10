@@ -1,12 +1,7 @@
 import { saveStoredProducts, formatPrice, getStorage } from "./shared.js";
 import { render, ui } from "./render.js";
 import { actions } from "./actions.js";
-
-export const state = {
-  products: [],
-  cart: [],
-  selectedCategory: "allt",
-};
+import { state } from "./states.js";
 
 state.cart = getStorage("cart") || [];
 

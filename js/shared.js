@@ -36,7 +36,7 @@ export const formatPrice = (price) => {
   return `${value.toLocaleString("sv-SE", {
     minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
     maximumFractionDigits: 2,
-  })}kr`;
+  })} kr`;
 };
 
 export const getCategories = (products) => [

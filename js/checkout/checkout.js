@@ -1,8 +1,9 @@
-import { state } from "../main.js";
-import { getProductImage, formatPrice } from "../shared.js";
+import { state } from "../states.js";
 import { pattern } from "./patterns.js";
-import { renderReceipt } from "./receiptView.js";
 import { getCartTotal } from "./cart.js";
+import { initClickEvents } from "../events.js";
+import { renderReceipt } from "./receiptView.js";
+import { getProductImage, formatPrice, getStorage } from "../shared.js";
 
 const checkoutProduct = document.getElementById("checkout-product");
 const checkoutForm = document.getElementById("checkout-form");
@@ -117,10 +118,12 @@ const renderProduct = (product) => {
 const createCartItem = (item) => {
   const card = document.createElement("div");
   card.className = "flex items-center gap-3 p-2 h-20 border rounded-lg";
+  card.dataset.id = item.id;
 
-  const img = document.createElement("div");
+  const img = document.createElement("img");
   img.className = "w-16 h-16 bg gray-200 rounded-md";
-  img.src = item.img;
+  img.src = getProductImage(item);
+  img.alt = item.title ?? "Bild saknas";
 
   const info = document.createElement("div");
   info.className = "flex flex-col justify-center flex-1";
@@ -139,18 +142,22 @@ const createCartItem = (item) => {
   const quantity = document.createElement("div");
   quantity.className = "flex items-center gap-1";
 
-  const decrement = document.createElement("button");
-  decrement.clasName =
-    "w-7 h-7 flex items-center justify-center bg-gray-200 rounded";
+  const decrement = document.createElement("div");
+  decrement.className =
+    "py-2 w-9 flex-center hover:bg-sky-400 text-black rounded text-center cursor-pointer";
+  decrement.dataset.action = "decrement";
   decrement.textContent = "-";
 
   const input = document.createElement("input");
-  input.clasName = "w-10 text-center border rounded text-sm";
+  input.className =
+    "text-center w-9 h-10 text-center border-1 border-gray-700 focus:border-pink-600";
+  input.dataset.action = "input";
   input.value = item.quantity;
 
   const increment = document.createElement("button");
-  increment.clasName =
-    "w-7 h-7 flex items-center justify-center bg-gray-200 rounded";
+  increment.className =
+    "py-2 w-9 flex-center hover:bg-sky-400 text-black rounded text-center cursor-pointer";
+  increment.dataset.action = "increment";
   increment.textContent = "+";
 
   quantity.appendChild(decrement);
@@ -159,8 +166,9 @@ const createCartItem = (item) => {
 
   const remove = document.createElement("div");
   remove.className =
-    "w-7 h-7 flex-center justify-ceneter bg-red-400 text-white rounded";
-  remove.textContenet = "X";
+    "w-6 h-6 flex-right justify-ceneter bg-red-400 text-black rounded text-center cursor-pointer";
+  remove.dataset.action = "remove";
+  remove.textContent = "x";
 
   card.appendChild(img);
   card.appendChild(info);
@@ -170,43 +178,12 @@ const createCartItem = (item) => {
   return card;
 };
 
-function renderCart() {
+export function renderCart() {
   checkoutProduct.innerHTML = "";
 
   state.cart.forEach((item) => {
     checkoutProduct.appendChild(createCartItem(item));
   });
-
-  //const imageUrl = getProductImage(product);
-
-  // if (imageUrl) {
-  //   const img = document.createElement("img");
-  //   img.src = imageUrl;
-  //   img.alt = product.title ?? "Produktbild";
-  //   img.className = "mb-4 h-56 w-full object-contain";
-  //   article.appendChild(img);
-  // }
-
-  // const title = document.createElement("h3");
-  // title.className = "mt-2 text-xl font-black";
-  // title.textContent = product.title ?? "Okänd produkt";
-
-  // const category = document.createElement("p");
-  // category.className = "text-xs font-black uppercase text-red-600";
-  // category.textContent = product.category ?? "okänd";
-
-  // const description = document.createElement("p");
-  // description.className = "mt-3 text-sm leading-6 text-gray-700";
-  // description.textContent =
-  //   product.description ?? "Ingen beskrivning tillgänglig.";
-
-  // const price = document.createElement("div");
-  // price.className = "text-md";
-  // price.textContent = formatPrice(product.price);
-
-  // const quantity = document.createElement("div");
-  // quantity.className = "text-md";
-  // quantity.textContent = `Antal produkter: ${product.quantity}`;
 
   // const totalPrice = document.createElement("div");
   // totalPrice.className = "font-black mt-4 text-lg";
@@ -227,7 +204,11 @@ function renderCart() {
 }
 
 const init = () => {
+  initClickEvents();
+  state.cart = getStorage("cart") || [];
+
   document.title = `Checkout - Grupp 10`;
+  console.log(state.cart.length);
   if (!state.cart.length) {
     document.title = "Ingen produkt vald - Grupp 10";
     renderProductMessage("Inga produkter i din varukorg");
