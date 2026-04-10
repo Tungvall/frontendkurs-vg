@@ -5,7 +5,6 @@ import { getProductImage, formatPrice, getStorage } from "../shared.js";
 import { state } from "../state.js";
 
 const checkoutProduct = document.getElementById("checkout-product");
-const checkoutForm = document.getElementById("checkout-form");
 const submitCartButton = document.getElementById("submitCart");
 const formMessage = document.getElementById("form-message");
 const userInformation = document.getElementById("user-information");
@@ -74,7 +73,7 @@ const createCartItem = (item) => {
 
   const price = document.createElement("div");
   price.className = "text-sm text-gray-600";
-  price.textContent = item.price;
+  price.textContent = formatPrice(item.price);
 
   info.appendChild(title);
   info.appendChild(price);
@@ -188,7 +187,14 @@ export function renderCart() {
 
     <p id="form-message" class="mt-4"></p>
   `;
-  layout.append(left, right);
+  console.log();
+  const cartTotalSum = formatPrice(getCartTotal());
+
+  const totalCost = document.createElement("div");
+  totalCost.className = "flex col-2 items-center gap-1 text-lg font-bold";
+  totalCost.textContent = `ATT BETALA: ${cartTotalSum}`;
+
+  layout.append(left, totalCost, right);
 
   container.className =
     "mx-auto w-full max-w-6xl grid gap-10 lg:grid-cols-2 items-start";
@@ -211,7 +217,7 @@ export function renderCart() {
 
 // checkoutProduct.appendChild(article);
 // checkoutProduct.appendChild(summary);
-
+const checkoutForm = document.getElementById("checkout-form");
 if (checkoutForm) {
   checkoutForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -230,7 +236,7 @@ if (checkoutForm) {
   checkoutForm.addEventListener("input", (e) => {
     const input = e.target.closest("[data-validate]");
     if (!input) return;
-
+    console.log("VALIDATE");
     validate(input);
   });
 }

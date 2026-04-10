@@ -41,7 +41,7 @@ const createRecentProductCard = (product) => {
 
   const price = document.createElement("p");
   price.className = "mt-1 text-base font-black text-blue-700";
-  price.textContent = product.price;
+  price.textContent = formatPrice(product.price);
 
   link.appendChild(category);
   link.appendChild(title);
@@ -118,7 +118,7 @@ const renderProductDetail = (product) => {
 
   const price = document.createElement("p");
   price.className = "mt-6 text-3xl font-black text-blue-700";
-  price.textContent = product.price;
+  price.textContent = formatPrice(product.price);
 
   const button = document.createElement("div");
   button.dataset.id = product.id;
