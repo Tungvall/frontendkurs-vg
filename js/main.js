@@ -1,12 +1,8 @@
 import { saveStoredProducts, formatPrice, getStorage } from "./shared.js";
 import { render, ui } from "./render.js";
-import { actions } from "./actions.js";
-
-export const state = {
-  products: [],
-  cart: [],
-  selectedCategory: "allt",
-};
+import { renderCart } from "./checkout/checkout.js";
+import { state } from "./state.js";
+import { decrementItem, incrementItem, removeItem } from "./checkout/cart.js";
 
 state.cart = getStorage("cart") || [];
 
@@ -36,7 +32,7 @@ async function loadItems() {
     state.products = products.map((product) => ({
       ...product,
       id: Number(product.id),
-      price: formatPrice(product.price),
+      price: Number(product.price),
     }));
 
     saveStoredProducts(state.products);
@@ -62,15 +58,26 @@ function setupPageEvents() {
     state.selectedCategory = button.dataset.category;
     render(state);
   });
-  ui.productList?.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-action]");
-    const { action, id } = button.dataset;
 
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-action]");
     if (!button) return;
 
+    const { action, id } = button.dataset;
+
     actions[action]?.(id);
+    console.log("DATASET:", button.dataset);
   });
 }
+
+const actions = {
+  addToCart: (id) => incrementItem(id),
+  increment: (id) => incrementItem(id),
+  decrement: (id) => decrementItem(id),
+  remove: (id) => removeItem(id),
+  set: (id, number) => setItem(id, number),
+  checkout: (id) => renderCart(),
+};
 
 setupPageEvents();
 loadItems();

@@ -4,7 +4,6 @@ import {
   getStoredProducts,
   saveRecentlyViewed,
 } from "./shared.js";
-import { initClickEvents } from "./events.js";
 
 initClickEvents();
 
@@ -19,7 +18,6 @@ const getProductIdFromUrl = () => {
 const createRecentProductCard = (product) => {
   const link = document.createElement("a");
 
-  link.href = `./product.html?id=${product.id}`;
   link.className =
     "border-2 border-black bg-transparent p-4  transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none";
 
@@ -124,7 +122,7 @@ const renderProductDetail = (product) => {
 
   const button = document.createElement("div");
   button.dataset.id = product.id;
-  button.dataset.action = "increment";
+  button.dataset.action = "addToCart";
 
   button.className =
     "cursor-pointer inline-flex items-center border-2 rounded-sm border-black bg-blue-500 px-2 py-1 text-sm font-black text-white transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ";
