@@ -36,7 +36,7 @@ async function loadItems() {
     state.products = products.map((product) => ({
       ...product,
       id: Number(product.id),
-      price: formatPrice(product.price),
+      price: Number(product.price),
     }));
 
     saveStoredProducts(state.products);

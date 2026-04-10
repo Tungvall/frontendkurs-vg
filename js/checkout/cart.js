@@ -37,3 +37,10 @@ export function setItem(id, number) {
   console.log(`Set item id: ${id}`);
   setStorage("cart", state.cart);
 }
+
+export const getCartTotal = () => {
+  return state.cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+};

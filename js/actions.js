@@ -3,7 +3,7 @@ import {
   decrementItem,
   removeItem,
   setItem,
-} from "./cart/cart.js";
+} from "./checkout/cart.js";
 export const actions = {
   increment: (id) => incrementItem(id),
   decrement: (id) => decrementItem(id),

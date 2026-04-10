@@ -1,7 +1,8 @@
-import { getProductImage, getStoredProducts } from "../shared.js";
+import { state } from "../main.js";
+import { getProductImage, formatPrice } from "../shared.js";
 import { pattern } from "./patterns.js";
 import { renderReceipt } from "./receiptView.js";
-import { state } from "../main.js";
+import { getCartTotal } from "./cart.js";
 
 const checkoutProduct = document.getElementById("checkout-product");
 const checkoutForm = document.getElementById("checkout-form");
@@ -74,34 +75,156 @@ const renderProduct = (product) => {
     article.appendChild(img);
   }
 
-  const category = document.createElement("p");
-  category.className = "text-xs font-black uppercase text-red-600";
-  category.textContent = product.category ?? "okänd";
-
   const title = document.createElement("h3");
   title.className = "mt-2 text-xl font-black";
   title.textContent = product.title ?? "Okänd produkt";
+
+  const category = document.createElement("p");
+  category.className = "text-xs font-black uppercase text-red-600";
+  category.textContent = product.category ?? "okänd";
 
   const description = document.createElement("p");
   description.className = "mt-3 text-sm leading-6 text-gray-700";
   description.textContent =
     product.description ?? "Ingen beskrivning tillgänglig.";
 
-  const price = document.createElement("p");
-  price.className = "mt-4 text-lg font-black text-blue-700";
-  price.textContent = product.price;
-  const quantity = document.createElement("p");
-  quantity.className = "mt-4 text-lg font-black text-blue-700";
-  quantity.textContent = product.quantity;
+  const price = document.createElement("div");
+  price.className = "text-md";
+  price.textContent = formatPrice(product.price);
+
+  const quantity = document.createElement("div");
+  quantity.className = "text-md";
+  quantity.textContent = `Antal produkter: ${product.quantity}`;
+
+  const totalPrice = document.createElement("div");
+  totalPrice.className = "font-black mt-4 text-lg";
+
+  const totalSum = formatPrice(getCartTotal());
+  totalPrice.textContent = `Totalt att betala: ${totalSum}`;
+
+  const summary = document.createElement("div");
+
+  summary.append(quantity, price, totalPrice);
 
   article.appendChild(category);
   article.appendChild(title);
   article.appendChild(description);
-  checkoutProduct.appendChild(price);
-  checkoutProduct.appendChild(quantity);
 
   checkoutProduct.appendChild(article);
+  checkoutProduct.appendChild(summary);
 };
+
+const createCartItem = (item) => {
+  const card = document.createElement("div");
+  card.className = "flex items-center gap-3 p-2 h-20 border rounded-lg";
+
+  const img = document.createElement("div");
+  img.className = "w-16 h-16 bg gray-200 rounded-md";
+  img.src = item.img;
+
+  const info = document.createElement("div");
+  info.className = "flex flex-col justify-center flex-1";
+
+  const title = document.createElement("div");
+  title.className = "text-sm font-medium";
+  title.textContent = item.title;
+
+  const price = document.createElement("div");
+  price.className = "text-sm text-gray-600";
+  price.textContent = item.price;
+
+  info.appendChild(title);
+  info.appendChild(price);
+
+  const quantity = document.createElement("div");
+  quantity.className = "flex items-center gap-1";
+
+  const decrement = document.createElement("button");
+  decrement.clasName =
+    "w-7 h-7 flex items-center justify-center bg-gray-200 rounded";
+  decrement.textContent = "-";
+
+  const input = document.createElement("input");
+  input.clasName = "w-10 text-center border rounded text-sm";
+  input.value = item.quantity;
+
+  const increment = document.createElement("button");
+  increment.clasName =
+    "w-7 h-7 flex items-center justify-center bg-gray-200 rounded";
+  increment.textContent = "+";
+
+  quantity.appendChild(decrement);
+  quantity.appendChild(input);
+  quantity.appendChild(increment);
+
+  const remove = document.createElement("div");
+  remove.className =
+    "w-7 h-7 flex-center justify-ceneter bg-red-400 text-white rounded";
+  remove.textContenet = "X";
+
+  card.appendChild(img);
+  card.appendChild(info);
+  card.appendChild(quantity);
+  card.appendChild(remove);
+
+  return card;
+};
+
+function renderCart() {
+  checkoutProduct.innerHTML = "";
+
+  state.cart.forEach((item) => {
+    checkoutProduct.appendChild(createCartItem(item));
+  });
+
+  //const imageUrl = getProductImage(product);
+
+  // if (imageUrl) {
+  //   const img = document.createElement("img");
+  //   img.src = imageUrl;
+  //   img.alt = product.title ?? "Produktbild";
+  //   img.className = "mb-4 h-56 w-full object-contain";
+  //   article.appendChild(img);
+  // }
+
+  // const title = document.createElement("h3");
+  // title.className = "mt-2 text-xl font-black";
+  // title.textContent = product.title ?? "Okänd produkt";
+
+  // const category = document.createElement("p");
+  // category.className = "text-xs font-black uppercase text-red-600";
+  // category.textContent = product.category ?? "okänd";
+
+  // const description = document.createElement("p");
+  // description.className = "mt-3 text-sm leading-6 text-gray-700";
+  // description.textContent =
+  //   product.description ?? "Ingen beskrivning tillgänglig.";
+
+  // const price = document.createElement("div");
+  // price.className = "text-md";
+  // price.textContent = formatPrice(product.price);
+
+  // const quantity = document.createElement("div");
+  // quantity.className = "text-md";
+  // quantity.textContent = `Antal produkter: ${product.quantity}`;
+
+  // const totalPrice = document.createElement("div");
+  // totalPrice.className = "font-black mt-4 text-lg";
+
+  // const totalSum = formatPrice(getCartTotal());
+  // totalPrice.textContent = `Totalt att betala: ${totalSum}`;
+
+  // const summary = document.createElement("div");
+
+  // summary.append(quantity, price, totalPrice);
+
+  // article.appendChild(category);
+  // article.appendChild(title);
+  // article.appendChild(description);
+
+  // checkoutProduct.appendChild(article);
+  // checkoutProduct.appendChild(summary);
+}
 
 const init = () => {
   document.title = `Checkout - Grupp 10`;
@@ -114,7 +237,7 @@ const init = () => {
   if (state.cart.length === 1) {
     renderProduct(state.cart[0]);
   } else if (state.cart.length > 1) {
-    renderCart(customer);
+    renderCart(state.cart);
   }
 };
 
