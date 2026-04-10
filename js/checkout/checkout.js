@@ -59,7 +59,6 @@ const renderFormMessage = (message, success = false) => {
 const createCartItem = (item) => {
   const card = document.createElement("div");
   card.className = "flex items-center gap-3 p-2 h-20 border rounded-lg";
-  card.dataset.id = item.id;
 
   const img = document.createElement("img");
   img.className = "w-16 h-16 bg gray-200 rounded-md";
