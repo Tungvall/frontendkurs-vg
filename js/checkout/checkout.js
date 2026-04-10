@@ -5,10 +5,10 @@ import { getProductImage, formatPrice, getStorage } from "../shared.js";
 import { state } from "../state.js";
 
 const checkoutProduct = document.getElementById("checkout-product");
-const submitCartButton = document.getElementById("submitCart");
 const formMessage = document.getElementById("form-message");
 const userInformation = document.getElementById("user-information");
 const container = document.getElementById("product-list");
+let submitCartButton = null;
 
 const formState = {
   name: false,
@@ -178,15 +178,15 @@ export function renderCart() {
           class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
       </div>
 
-      <button id="submitCart" type="submit" disabled
+      <button id="submit-cart" type="submit" disabled
         class="inline-flex w-fit items-center rounded-2xl border-4 border-black bg-green-500 px-5 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] disabled:opacity-50">
         Slutför köp
-      </button>
-
-    </form>
-
-    <p id="form-message" class="mt-4"></p>
-  `;
+        </button>
+        
+        </form>
+        
+        <p id="form-message" class="mt-4"></p>
+        `;
   console.log();
   const cartTotalSum = formatPrice(getCartTotal());
 
@@ -199,47 +199,32 @@ export function renderCart() {
   container.className =
     "mx-auto w-full max-w-6xl grid gap-10 lg:grid-cols-2 items-start";
   container.appendChild(layout);
+  submitCartButton = document.getElementById("submit-cart");
 }
 
-// const totalPrice = document.createElement("div");
-// totalPrice.className = "font-black mt-4 text-lg";
-
-// const totalSum = formatPrice(getCartTotal());
-// totalPrice.textContent = `Totalt att betala: ${totalSum}`;
-
-// const summary = document.createElement("div");
-
-// summary.append(quantity, price, totalPrice);
-
-// article.appendChild(category);
-// article.appendChild(title);
-// article.appendChild(description);
-
-// checkoutProduct.appendChild(article);
-// checkoutProduct.appendChild(summary);
 const checkoutForm = document.getElementById("checkout-form");
-if (checkoutForm) {
-  checkoutForm.addEventListener("submit", (event) => {
-    event.preventDefault();
+document.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const form = event.target;
 
-    const customer = getCustomerData(checkoutForm);
+  console.log(form.elements["name"]?.value || "");
 
-    Object.keys(formState).forEach((key) => {
-      formState[key] = false;
+  const customer = getCustomerData(event.target);
 
-      userInformation.innerHTML = renderReceipt(customer);
-      submitCartButton.disabled = true;
-      // checkoutForm.reset();
-    });
+  Object.keys(formState).forEach((key) => {
+    formState[key] = false;
+
+    container.innerHTML = renderReceipt(customer);
+    submitCartButton.disabled = true;
   });
+});
 
-  checkoutForm.addEventListener("input", (e) => {
-    const input = e.target.closest("[data-validate]");
-    if (!input) return;
-    console.log("VALIDATE");
-    validate(input);
-  });
-}
+document.addEventListener("input", (e) => {
+  const input = e.target.closest("[data-validate]");
+  if (!input) return;
+  console.log("VALIDATE");
+  validate(input);
+});
 
 function validate(input) {
   if (!input) return;
@@ -268,15 +253,14 @@ function updateButton() {
   }
 }
 
-function getCustomerData(checkoutForm) {
+function getCustomerData(form) {
   return {
-    name: checkoutForm.name.value,
-    email: checkoutForm.email.value,
-    phone: checkoutForm.phone.value,
-    street: checkoutForm.street.value,
-    postal: checkoutForm.postal.value,
-    city: checkoutForm.city.value,
+    name: form.elements["name"]?.value || "",
+    email: form.elements["email"]?.value || "",
+    phone: form.elements["phone"]?.value || "",
+    street: form.elements["street"]?.value || "",
+    postal: form.elements["postal"]?.value || "",
+    city: form.elements["city"]?.value || "",
   };
 }
-
 renderFormMessage("Fyll i dina uppgifter för att slutföra köpet.");
