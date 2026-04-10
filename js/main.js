@@ -2,7 +2,12 @@ import { saveStoredProducts, formatPrice, getStorage } from "./shared.js";
 import { render, ui } from "./render.js";
 import { renderCart } from "./checkout/checkout.js";
 import { state } from "./state.js";
-import { decrementItem, incrementItem, removeItem } from "./checkout/cart.js";
+import {
+  decrementItem,
+  incrementItem,
+  removeItem,
+  addToCart,
+} from "./checkout/cart.js";
 
 state.cart = getStorage("cart") || [];
 
@@ -71,7 +76,7 @@ function setupPageEvents() {
 }
 
 const actions = {
-  addToCart: (id) => incrementItem(id),
+  addToCart: (id) => addToCart(id),
   increment: (id) => incrementItem(id),
   decrement: (id) => decrementItem(id),
   remove: (id) => removeItem(id),

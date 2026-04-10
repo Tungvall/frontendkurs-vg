@@ -93,7 +93,7 @@ const createProductCard = (product, categories) => {
   const categoryName = product.category ?? "okänd";
   const theme = getCategoryTheme(categoryName, categories);
   article.dataset.id = product.id;
-  article.dataset.action = "addToCart";
+
   article.className = [
     "flex h-full flex-col rounded-md border-2 border-black p-5",
     theme.card,
@@ -137,6 +137,8 @@ const createProductCard = (product, categories) => {
   price.textContent = product.price;
 
   const button = document.createElement("div");
+  button.dataset.action = "addToCart";
+  button.dataset.id = product.id;
 
   button.className =
     "cursor-pointer inline-flex items-center border-2 rounded-sm border-black bg-blue-500 px-2 py-1 text-sm font-black text-white transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ";

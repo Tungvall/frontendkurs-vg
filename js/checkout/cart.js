@@ -1,8 +1,24 @@
 import { state } from "../state.js";
 import { setStorage } from "../shared.js";
 import { renderCart } from "./checkout.js";
-export function incrementItem(id) {
 
+export function addToCart(id) {
+  console.log("Add to cart function runs");
+  const product = state.products.find((p) => p.id === Number(id));
+  if (!product) return;
+
+  const added = state.cart.find((p) => p.id === Number(id));
+
+  if (added) {
+    added.quantity += 1;
+  } else {
+    state.cart.push({ ...product, quantity: 1 });
+  }
+
+  setStorage("cart", state.cart);
+}
+
+export function incrementItem(id) {
   console.log("increment function runs");
   const product = state.products.find((p) => p.id === Number(id));
   if (!product) return;
@@ -30,15 +46,6 @@ export function decrementItem(id) {
   }
 
   renderCart();
-  setStorage("cart", state.cart);
-}
-export function addToCart(id) {D
-  console.log("decrement function runs");
-  const item = state.cart.find((p) => p.id === Number(id));
-  if (!item) return;
-
-  if (item.quantity > 1) return;D
-  item.quantity -= 1;
   setStorage("cart", state.cart);
 }
 
