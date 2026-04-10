@@ -1,7 +1,8 @@
 import { saveStoredProducts, formatPrice, getStorage } from "./shared.js";
 import { render, ui } from "./render.js";
-import { actions } from "./actions.js";
-import { state } from "./states.js";
+import { renderCart } from "./checkout/checkout.js";
+import { state } from "./state.js";
+import { decrementItem, incrementItem, removeItem } from "./checkout/cart.js";
 
 state.cart = getStorage("cart") || [];
 
@@ -57,15 +58,26 @@ function setupPageEvents() {
     state.selectedCategory = button.dataset.category;
     render(state);
   });
-  ui.productList?.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-action]");
-    const { action, id } = button.dataset;
 
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-action]");
     if (!button) return;
 
+    const { action, id } = button.dataset;
+
     actions[action]?.(id);
+    console.log("DATASET:", button.dataset);
   });
 }
+
+const actions = {
+  addToCart: (id) => incrementItem(id),
+  increment: (id) => incrementItem(id),
+  decrement: (id) => decrementItem(id),
+  remove: (id) => removeItem(id),
+  set: (id, number) => setItem(id, number),
+  checkout: (id) => renderCart(),
+};
 
 setupPageEvents();
 loadItems();

@@ -93,14 +93,14 @@ const createProductCard = (product, categories) => {
   const categoryName = product.category ?? "okänd";
   const theme = getCategoryTheme(categoryName, categories);
   article.dataset.id = product.id;
-  article.dataset.action = "increment";
+  article.dataset.action = "addToCart";
   article.className = [
     "flex h-full flex-col rounded-md border-2 border-black p-5",
     theme.card,
   ].join(" ");
 
   const link = document.createElement("a");
-  link.href = `./product.html?id=${product.id}`;
+
   link.className = "block flex-1";
 
   const imageUrl = getProductImage(product);

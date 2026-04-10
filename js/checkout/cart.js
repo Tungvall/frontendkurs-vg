@@ -1,8 +1,8 @@
-import { state } from "../states.js";
+import { state } from "../state.js";
 import { setStorage } from "../shared.js";
 import { renderCart } from "./checkout.js";
-
 export function incrementItem(id) {
+
   console.log("increment function runs");
   const product = state.products.find((p) => p.id === Number(id));
   if (!product) return;
@@ -14,27 +14,38 @@ export function incrementItem(id) {
   } else {
     state.cart.push({ ...product, quantity: 1 });
   }
-  console.log("CART STATE:", state.cart);
-  console.log("Cart length:", state.cart.length);
+
   renderCart();
   setStorage("cart", state.cart);
 }
 
 export function decrementItem(id) {
+  const item = state.cart.find((p) => p.id === Number(id));
+  if (!item) return;
+
+  if (item.quantity <= 1) {
+    state.cart = state.cart.filter((p) => p.id !== Number(id));
+  } else {
+    item.quantity -= 1;
+  }
+
+  renderCart();
+  setStorage("cart", state.cart);
+}
+export function addToCart(id) {D
   console.log("decrement function runs");
   const item = state.cart.find((p) => p.id === Number(id));
   if (!item) return;
 
-  if (item.quantity > 1) return;
+  if (item.quantity > 1) return;D
   item.quantity -= 1;
-
-  console.log("CART STATE:", state.cart);
   setStorage("cart", state.cart);
 }
 
 export function removeItem(id) {
-  console.log("removeItem function runs");
-  console.log(`Removed id: ${id}`);
+  state.cart = state.cart.filter((item) => item.id !== Number(id));
+
+  renderCart();
   setStorage("cart", state.cart);
 }
 
@@ -42,6 +53,7 @@ export function setItem(id, number) {
   console.log("setItem function runs");
   console.log(`Set item id: ${id}`);
   setStorage("cart", state.cart);
+  renderCart();
 }
 
 export const getCartTotal = () => {

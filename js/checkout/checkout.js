@@ -1,15 +1,15 @@
-import { state } from "../states.js";
 import { pattern } from "./patterns.js";
 import { getCartTotal } from "./cart.js";
-import { initClickEvents } from "../events.js";
 import { renderReceipt } from "./receiptView.js";
 import { getProductImage, formatPrice, getStorage } from "../shared.js";
+import { state } from "../state.js";
 
 const checkoutProduct = document.getElementById("checkout-product");
 const checkoutForm = document.getElementById("checkout-form");
 const submitCartButton = document.getElementById("submitCart");
 const formMessage = document.getElementById("form-message");
 const userInformation = document.getElementById("user-information");
+const container = document.getElementById("product-list");
 
 const formState = {
   name: false,
@@ -56,65 +56,6 @@ const renderFormMessage = (message, success = false) => {
   ].join(" ");
 };
 
-const renderProduct = (product) => {
-  if (!checkoutProduct) {
-    return;
-  }
-
-  checkoutProduct.replaceChildren();
-
-  const article = document.createElement("article");
-  article.className = "border-2 border-black bg-blue-100 p-5 ";
-
-  const imageUrl = getProductImage(product);
-
-  if (imageUrl) {
-    const img = document.createElement("img");
-    img.src = imageUrl;
-    img.alt = product.title ?? "Produktbild";
-    img.className = "mb-4 h-56 w-full object-contain";
-    article.appendChild(img);
-  }
-
-  const title = document.createElement("h3");
-  title.className = "mt-2 text-xl font-black";
-  title.textContent = product.title ?? "Okänd produkt";
-
-  const category = document.createElement("p");
-  category.className = "text-xs font-black uppercase text-red-600";
-  category.textContent = product.category ?? "okänd";
-
-  const description = document.createElement("p");
-  description.className = "mt-3 text-sm leading-6 text-gray-700";
-  description.textContent =
-    product.description ?? "Ingen beskrivning tillgänglig.";
-
-  const price = document.createElement("div");
-  price.className = "text-md";
-  price.textContent = formatPrice(product.price);
-
-  const quantity = document.createElement("div");
-  quantity.className = "text-md";
-  quantity.textContent = `Antal produkter: ${product.quantity}`;
-
-  const totalPrice = document.createElement("div");
-  totalPrice.className = "font-black mt-4 text-lg";
-
-  const totalSum = formatPrice(getCartTotal());
-  totalPrice.textContent = `Totalt att betala: ${totalSum}`;
-
-  const summary = document.createElement("div");
-
-  summary.append(quantity, price, totalPrice);
-
-  article.appendChild(category);
-  article.appendChild(title);
-  article.appendChild(description);
-
-  checkoutProduct.appendChild(article);
-  checkoutProduct.appendChild(summary);
-};
-
 const createCartItem = (item) => {
   const card = document.createElement("div");
   card.className = "flex items-center gap-3 p-2 h-20 border rounded-lg";
@@ -146,18 +87,21 @@ const createCartItem = (item) => {
   decrement.className =
     "py-2 w-9 flex-center hover:bg-sky-400 text-black rounded text-center cursor-pointer";
   decrement.dataset.action = "decrement";
+  decrement.dataset.id = item.id;
   decrement.textContent = "-";
 
   const input = document.createElement("input");
   input.className =
     "text-center w-9 h-10 text-center border-1 border-gray-700 focus:border-pink-600";
   input.dataset.action = "input";
+  input.dataset.id = item.id;
   input.value = item.quantity;
 
-  const increment = document.createElement("button");
+  const increment = document.createElement("div");
   increment.className =
     "py-2 w-9 flex-center hover:bg-sky-400 text-black rounded text-center cursor-pointer";
   increment.dataset.action = "increment";
+  increment.dataset.id = item.id;
   increment.textContent = "+";
 
   quantity.appendChild(decrement);
@@ -168,6 +112,7 @@ const createCartItem = (item) => {
   remove.className =
     "w-6 h-6 flex-right justify-ceneter bg-red-400 text-black rounded text-center cursor-pointer";
   remove.dataset.action = "remove";
+  remove.dataset.id = item.id;
   remove.textContent = "x";
 
   card.appendChild(img);
@@ -179,48 +124,94 @@ const createCartItem = (item) => {
 };
 
 export function renderCart() {
-  checkoutProduct.innerHTML = "";
+  container.innerHTML = "";
+
+  const layout = document.createElement("div");
+  layout.className = "mx-auto w-full max-w-5xl grid gap-8  items-start";
+
+  const left = document.createElement("div");
+  left.id = "checkout-left";
 
   state.cart.forEach((item) => {
-    checkoutProduct.appendChild(createCartItem(item));
+    left.appendChild(createCartItem(item));
   });
 
-  // const totalPrice = document.createElement("div");
-  // totalPrice.className = "font-black mt-4 text-lg";
+  const right = document.createElement("div");
+  right.id = "checkout-right";
 
-  // const totalSum = formatPrice(getCartTotal());
-  // totalPrice.textContent = `Totalt att betala: ${totalSum}`;
+  right.innerHTML = `
+    <h2 class="text-2xl font-black text-red-600">Dina uppgifter</h2>
 
-  // const summary = document.createElement("div");
+    <form id="checkout-form" class="mt-4 flex flex-col gap-4">
 
-  // summary.append(quantity, price, totalPrice);
+      <div>
+        <label class="mb-2 block text-sm font-black">Namn</label>
+        <input name="name" data-validate="name"
+          class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
+      </div>
 
-  // article.appendChild(category);
-  // article.appendChild(title);
-  // article.appendChild(description);
+      <div>
+        <label class="mb-2 block text-sm font-black">E-post</label>
+        <input name="email" data-validate="email"
+          class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
+      </div>
 
-  // checkoutProduct.appendChild(article);
-  // checkoutProduct.appendChild(summary);
+      <div>
+        <label class="mb-2 block text-sm font-black">Telefon</label>
+        <input name="phone" data-validate="phone"
+          class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-black">Gatuadress</label>
+        <input name="street" data-validate="street"
+          class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-black">Postnummer</label>
+        <input name="postal" data-validate="postal"
+          class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-black">Ort</label>
+        <input name="city" data-validate="city"
+          class="w-full rounded-2xl border-4 border-black bg-yellow-500/20 px-4 py-3 font-medium outline-none" />
+      </div>
+
+      <button id="submitCart" type="submit" disabled
+        class="inline-flex w-fit items-center rounded-2xl border-4 border-black bg-green-500 px-5 py-3 text-sm font-black text-white shadow-[4px_4px_0px_#000] disabled:opacity-50">
+        Slutför köp
+      </button>
+
+    </form>
+
+    <p id="form-message" class="mt-4"></p>
+  `;
+  layout.append(left, right);
+
+  container.className =
+    "mx-auto w-full max-w-6xl grid gap-10 lg:grid-cols-2 items-start";
+  container.appendChild(layout);
 }
 
-const init = () => {
-  initClickEvents();
-  state.cart = getStorage("cart") || [];
+// const totalPrice = document.createElement("div");
+// totalPrice.className = "font-black mt-4 text-lg";
 
-  document.title = `Checkout - Grupp 10`;
-  console.log(state.cart.length);
-  if (!state.cart.length) {
-    document.title = "Ingen produkt vald - Grupp 10";
-    renderProductMessage("Inga produkter i din varukorg");
-    return;
-  }
-  console.table(state.cart);
-  if (state.cart.length === 1) {
-    renderProduct(state.cart[0]);
-  } else if (state.cart.length > 1) {
-    renderCart(state.cart);
-  }
-};
+// const totalSum = formatPrice(getCartTotal());
+// totalPrice.textContent = `Totalt att betala: ${totalSum}`;
+
+// const summary = document.createElement("div");
+
+// summary.append(quantity, price, totalPrice);
+
+// article.appendChild(category);
+// article.appendChild(title);
+// article.appendChild(description);
+
+// checkoutProduct.appendChild(article);
+// checkoutProduct.appendChild(summary);
 
 if (checkoutForm) {
   checkoutForm.addEventListener("submit", (event) => {
@@ -284,4 +275,3 @@ function getCustomerData(checkoutForm) {
 }
 
 renderFormMessage("Fyll i dina uppgifter för att slutföra köpet.");
-init();
